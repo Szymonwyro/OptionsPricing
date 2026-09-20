@@ -7,7 +7,6 @@ def main():
 
         # maybe unit test these too
         d1 = (math.log(S/K) + ((r + 0.5 * sigma**2)) * T) / (sigma * math.sqrt(T))
-        
         d2 = d1 - sigma * math.sqrt(d1)
         
         N_d1 = norm.cdf(d1)
@@ -15,6 +14,9 @@ def main():
         
         N_neg_d1 = norm.cdf(-d1)
         N_neg_d2 = norm.cdf(-d2)
+
+        Prob_d1 = norm.pdf(d1)
+        Prob_d2 = norm.pdf(d2)
     
     def black_scholes_price(S, K, T, r, sigma, option_type="call"):
 
@@ -44,17 +46,21 @@ def main():
 
     def delta(S, K, T, r, sigma, option_type="call"):
         return _d1_d2.N_d1
-    def delta(S, K, T, r, sigma, option_type = "put"):
+    def delta(S, K, T, r, sigma, option_type ="put"):
         return _d1_d2.N_d1 - 1
 
     def gamma(S, K, T, r, sigma, option_type):
         return _d1_d2.N_d1 / (S * sigma * math.sqrt(T))
         
+    def vega(S, K, T, r, sigma, option_type):
+        return S * _d1_d2.Prob_d1 * math.sqrt(T)
 
-    def vega():
-
-    def theta():
-
-    def rho():
-
+    def theta(S, K, T, r, sigma, option_type="call"):
+        return -(S * _d1_d2.Prob_d1 * sigma) / (2 * math.sqrt(T)) - r * K * math.exp(-r * T) * _d1_d2.N_d2
+    def theta(S,K, T, r, sigma, option_type="put"):
+        return -(S * _d1_d2.Prob_d1 * sigma) / (2 * math.sqrt(T)) - r * K * math.exp(-r * T) * _d1_d2.N_d2_neg
     
+    def rho(S, K, T, r, sigma, option_type="call"):
+        return K * T * math.exp(-r * T) * _d1_d2.N_d2
+    def rho(S, K, T, r, sigma, option_type="put"):
+        return K * T * math.exp(-r * T) * _d1_d2.N_neg_d2
